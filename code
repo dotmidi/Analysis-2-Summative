@@ -1,0 +1,136 @@
+import random
+def group_info():
+    student_number = ("0994510")
+    name = ("Izzet Samil Döne")
+    class_code = ("INF1H")
+    student1 = (student_number, name, class_code)
+    # print(student1)
+    return student1
+
+# every print that is commented was used for debugging
+
+def compare(guess,target):
+    result_list = []                     # empty list
+    L = []                          # ditto
+    G = list(guess)                 # "test" -> ("t","e","s","t"), will be useful for the comparing we're doing later
+    T = list(target)                # ditto
+
+    for i in range(len(guess)):     # makes a list with blank spaces so we can more easily fill the blanks when comparing words
+        result_list += ("-")
+
+    # print(result_list)
+    # print(G)
+    # print(T)
+
+    count = 0
+    for i in range(len(guess)):     # this for loop iterates through all of the items in both lists, comparing the items between them and adjusting results accordingly
+        if G[count] == T[count]:
+            result_list[count] = 'X'
+            count += 1
+        else:
+            L.append(T[count])
+            count += 1
+    
+    # print(L)
+    count = 0
+    for i in range (len(guess)):
+        if G[count] in L and result_list[count] != 'X':
+            result_list[count] = 'O'
+            L.remove(G[count])
+            count += 1
+        else:
+            count += 1
+
+    result_c = ''.join(result_list)
+    # print(result_c)
+    return result_c
+
+def filter_targets(targets, guess_results): 
+    result_f = [] 
+    for target in targets: 
+        if all(compare(guess, target) == guess_results[guess] 
+            for guess in guess_results): 
+                result_f.append(target) 
+    return result_f 
+
+def distribution(guess, targets):
+    result_d = {}
+    for target in targets:
+        if compare(guess, target) not in result_d:
+            result_d[compare(guess, target)] = 1
+        else:
+            result_d[compare(guess, target)] += 1
+    # print(result_d)
+    return result_d
+
+
+def simulate_game(target, wordlist):
+    n = len(target)
+    wordlist = [w for w in wordlist if len(w) == n and w[0] == target[0]]
+    if target not in wordlist:
+        raise ValueError("Target is not in wordlist, thus impossible to guess.")
+    targets = wordlist.copy()
+    turns = 0
+    while True:
+        num_words = len(targets)
+        print(f"There {'is' if num_words==1 else 'are'} {num_words} possible"
+            f" target{'s' if num_words!=1 else ''} left.")
+        turns += 1
+        guess = smart_guess(wordlist, targets)
+        print("My guess is: ", guess.upper())
+        result = compare(guess, target)
+        print("Correctness: ", result)
+        if result == n * "X":
+            print(f"Target was guessed in {turns} "
+                f"turn{'s' if turns!=1 else ''}.")
+            break
+        else:
+            targets = filter_targets(targets, {guess: result})
+
+
+def count_turns(target, wordlist):
+    n = len(target)
+    wordlist = [w for w in wordlist if len(w) == n and w[0]==target[0]]
+    targets = wordlist.copy()
+    turns = 0
+    while True:
+        turns += 1
+        if turns > 100:
+            raise RuntimeError("This is going nowhere: 100 turns used.")
+        guess = smart_guess(wordlist, targets)
+        result = compare(guess, target)
+        if result == n * "X":
+            break
+        else:
+            targets = filter_targets(targets, {guess: result})
+
+    return turns
+
+def turn_count_simulation(word_length, wordlist, runs=1000):
+    wordlist = [word for word in wordlist if len(word) == word_length]
+    total = 0
+    for _ in range(runs):
+        target = random.choice(wordlist)
+        total += count_turns(target, wordlist)
+    print(total/runs)
+    return total/runs
+
+def load_words(file): 
+    result = set()
+    with open(file) as f: 
+        for line in f.readlines(): 
+            word = line.strip().lower() 
+            if word.isalpha() and word.isascii(): 
+                result.add(word) 
+    return sorted(result) 
+
+
+def smart_guess(wordlist, targets): 
+    return random.choice(targets) 
+
+
+dutch_words = load_words("wordlist.txt")
+turn_count_simulation(5, dutch_words)
+# simulate_game("concert", dutch_words)
+# compare("ouwelui","oliebol")
+# distribution("ouwelui",['occasie', 'officie', 'oliebol', 'oliegas', 'oliejas', 'oliekop', 'oliepak', 'omissie', 'ommezij', 'omwille', 'ophielp', 'ouwelui'])

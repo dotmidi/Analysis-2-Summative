@@ -1,11 +1,12 @@
 import random
 def group_info():
-    student_number = ("0994510")
-    name = ("Izzet Samil Döne")
+    student_number = ("0984155","0994510")
+    name = ("Azif Rosan","Izzet Samil Döne")
     class_code = ("INF1H")
-    student1 = (student_number, name, class_code)
-    # print(student1)
-    return student1
+    student1 = (student_number[0], name[0], class_code)
+    student2 = (student_number[1], name[1], class_code)
+    print(student1,student2)
+    return student1,student2
 
 # every print that is commented was used for debugging
 
@@ -130,7 +131,8 @@ def smart_guess(wordlist, targets):
 
 
 dutch_words = load_words("wordlist.txt")
-turn_count_simulation(5, dutch_words)
+#turn_count_simulation(5, dutch_words)
 # simulate_game("concert", dutch_words)
 # compare("ouwelui","oliebol")
 # distribution("ouwelui",['occasie', 'officie', 'oliebol', 'oliegas', 'oliejas', 'oliekop', 'oliepak', 'omissie', 'ommezij', 'omwille', 'ophielp', 'ouwelui'])
+group_info()
